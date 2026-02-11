@@ -1,0 +1,4 @@
+build/
+*.xml
+*.svg
+.vscode/
