@@ -56,6 +56,14 @@ void MainWindow::createToolbar()
     rectAction->setCheckable(true);
     connect(rectAction, &QAction::triggered, this, [this](){canvas->setTool(Tool::Rect);});
 
+    resizeAction = new QAction("Resize", this);
+    resizeAction->setCheckable(true);
+    connect(resizeAction, &QAction::triggered, this, [this](){canvas->setTool(Tool::Resize);});
+
+    moveAction = new QAction("Move", this);
+    moveAction->setCheckable(true);
+    connect(moveAction, &QAction::triggered, this, [this](){canvas->setTool(Tool::Move);});
+
     textAction = new QAction("Text", this);
     textAction->setCheckable(true);
     connect(textAction, &QAction::triggered, this, [this](){canvas->setTool(Tool::Text);});
@@ -78,12 +86,22 @@ void MainWindow::createToolbar()
 
     insideAction = new QAction("Fill_C", this);
     insideAction->setCheckable(true);
-    connect(insideAction, &QAction::triggered, this, [this](){canvas->setcurrFill(QColorDialog::getColor(Qt::white, this, "Select Color"));});
+    connect(insideAction, &QAction::triggered, this, [this](){if(!insideAction->isChecked()) canvas->setcurrFill(QColorDialog::getColor(Qt::white, this, "Select Color")); else canvas->setcurrFill(Qt::NoBrush);});
 
     thickAction = new QAction("strk_width", this);
     thickAction->setCheckable(true);
     connect(thickAction, &QAction::triggered, this, [this](){bool ok; canvas->setStrokeWidth(QInputDialog::getDouble(this, tr("Round Rect"), tr("Enter Corner Radius:"), 10, 0, 10000, 1, &ok));});
-    tools->addActions({circleAction, rectAction, roundRectAction, hexagonAction, lineAction, borderAction, insideAction, thickAction, textAction});
+
+    undoAction = new QAction("Undo", this);
+    undoAction->setCheckable(true);
+    connect(undoAction, &QAction::triggered, this, [this](){diagram.undo(); canvas->update();});
+
+    redoAction = new QAction("Redo", this);
+    redoAction->setCheckable(true);
+    connect(redoAction, &QAction::triggered, this, [this](){diagram.redo();canvas->update();});
+
+    tools->addActions({circleAction, rectAction, roundRectAction, hexagonAction, lineAction, borderAction, insideAction, thickAction, textAction, undoAction, redoAction, resizeAction, moveAction});
+
 }
 
 void MainWindow::openSVG()

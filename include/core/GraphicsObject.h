@@ -36,7 +36,8 @@ public:
     virtual std::string toSVG() const = 0;
     virtual std::shared_ptr<GraphicsObject> clone() const = 0;
     //can we go >= 2 levels down in case of virtual functions?
-
+    void resize(const double factor);
+    void move(const QLineF l);
     void setStroke(const QColor& s);
     void setFill(const QColor& f);
     void setStrokeWidth(float w);
@@ -47,7 +48,7 @@ public:
 
 protected:
     QColor stroke = Qt::black;
-    QColor fill = Qt::black;
+    QColor fill = Qt::NoBrush;
     double strokeWidth = 1.0f;
     // QPointF p1;
     // QPointF p2;

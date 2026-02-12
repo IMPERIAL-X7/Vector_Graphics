@@ -31,6 +31,8 @@ public:
     void setcurrStroke(QColor c);
     void setcurrFill(QColor c);
     void setStrokeWidth(double d);
+    // void move(QLineF l);
+    std::shared_ptr<GraphicsObject> search(const QPointF& p_);
 
 protected:
     void paintEvent(QPaintEvent*) override;
@@ -41,10 +43,12 @@ protected:
 private:
     Diagram* diagram = nullptr;
     Tool currentTool = Tool::None;
+    std::shared_ptr<GraphicsObject> currShape = nullptr;
     bool dragging = false;
     QPointF startPos;
+    QPointF justBefore;
     QPointF currentPos;
     QColor currStroke = Qt::black;
-    QColor currFill = Qt::black;
+    QColor currFill = Qt::NoBrush;
     double currStrokeWidth = 1.0f;
 };

@@ -27,3 +27,20 @@ void GraphicsObject::setBoundingBox(const QPointF& p1, const QPointF& p2)
     QRectF box_ = QRectF(p1, p2);
     bBox = box_.normalized();
 }
+
+void GraphicsObject::resize(const double factor)
+{
+    QPointF center = bBox.center();
+    double w = bBox.width();
+    double h = bBox.height();
+    double newW = w * factor;
+    double newH = h * factor;
+    double newX = center.x() - newW / 2;
+    double newY = center.y() - newH / 2;
+    bBox = QRectF(newX, newY, newW, newH);
+}
+
+void GraphicsObject::move(const QLineF l)
+{
+    bBox.translate(l.dx(), l.dy());
+}

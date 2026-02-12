@@ -1,8 +1,11 @@
 #pragma once
 
-enum class Tool 
+enum class Tool
 {
     None,
+    Resize,
+    Move,
+    Select,
     Circle,
     Rect,
     RoundRect,

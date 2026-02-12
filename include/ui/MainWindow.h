@@ -25,7 +25,11 @@ private:
     QAction* insideAction;
     QAction* thickAction;
     QAction* textAction;
-
+    QAction* undoAction;
+    QAction* redoAction;
+    QAction* resizeAction;
+    QAction* moveAction;
+    
     void createMenus();
     void createToolbar();
 };
