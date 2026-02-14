@@ -16,15 +16,15 @@ public:
     void add(std::shared_ptr<GraphicsObject>& obj);
     const std::vector<std::shared_ptr<GraphicsObject>>& objects() const;
     void destroy(std::shared_ptr<GraphicsObject>& obj);
-    void undo();
-    void redo();
+    // void undo_add();
+    // void redo_add();
     void clear();
 private:
     std::vector<std::shared_ptr<GraphicsObject>> objs; //remember to add _ later
-    std::deque<std::pair<std::shared_ptr<GraphicsObject>, int>>undo_stack;
-    std::deque<std::pair<std::shared_ptr<GraphicsObject>, int>>redo_stack;
-    void undo_push_(const std::pair<std::shared_ptr<GraphicsObject>, int>& p);
-    void redo_push_(const std::pair<std::shared_ptr<GraphicsObject>, int>& p);
+    // std::deque<std::pair<std::shared_ptr<GraphicsObject>, int>>undo_stack;
+    // std::deque<std::pair<std::shared_ptr<GraphicsObject>, int>>redo_stack;
+    // void undo_push_(const std::pair<std::shared_ptr<GraphicsObject>, int>& p);
+    // void redo_push_(const std::pair<std::shared_ptr<GraphicsObject>, int>& p);
 };
 
 /*

@@ -16,6 +16,7 @@
 class GraphicsObject
 {
 public:
+    // GraphicsObject();
     virtual ~GraphicsObject(); //~GraphicsObject() = default;
     /* 
         virtual: let the derived classes, definition override 

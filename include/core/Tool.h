@@ -2,14 +2,15 @@
 
 enum class Tool
 {
-    None,
     Resize,
     Move,
-    Select,
     Circle,
     Rect,
     RoundRect,
     Hexagon,
     Line,
+    Select,
+    None,
     Text
 };
+

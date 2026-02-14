@@ -46,5 +46,7 @@ std::string Text::toSVG() const
 
 std::shared_ptr<GraphicsObject> Text::clone() const 
 {
-    return std::make_shared<Text>(*this);
+    auto clone_ = std::make_shared<Text>(stroke, fill, strokeWidth);
+    clone_->setBoundingBox(this->bBox.topLeft(), this->bBox.bottomRight());
+    return clone_;
 }

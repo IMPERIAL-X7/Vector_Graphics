@@ -26,5 +26,7 @@ std::string Rect::toSVG() const
 
 std::shared_ptr<GraphicsObject> Rect::clone() const 
 {
-    return std::make_shared<Rect>(*this);
+    auto clone_ = std::make_shared<Rect>(stroke, fill, strokeWidth);
+    clone_->setBoundingBox(this->bBox.topLeft(), this->bBox.bottomRight());
+    return clone_;
 }

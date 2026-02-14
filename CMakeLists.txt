@@ -17,6 +17,7 @@ add_executable(VectorGraphics
 
     src/core/GraphicsObject.cpp
     src/core/Diagram.cpp
+    src/core/Command.cpp
     include/ui/Canvas.h
     include/ui/MainWindow.h
     src/core/ShapeMaker.cpp

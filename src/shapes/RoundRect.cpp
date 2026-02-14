@@ -36,5 +36,7 @@ std::string RoundRect::toSVG() const
 
 std::shared_ptr<GraphicsObject> RoundRect::clone() const 
 {
-    return std::make_shared<RoundRect>(*this);
+    auto clone_ = std::make_shared<RoundRect>(stroke, fill, strokeWidth);
+    clone_->setBoundingBox(this->bBox.topLeft(), this->bBox.bottomRight());
+    return clone_;
 }

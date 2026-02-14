@@ -1,6 +1,7 @@
 #pragma once
 #include "core/Diagram.h"
 #include "core/Tool.h"
+#include "core/Command.h"
 #include <QWidget>
 #include <QPointF>
 #include <QMouseEvent>
@@ -26,11 +27,14 @@ public:
         and encourage 
         Canvas(w);
     */
-    void setDiagram(Diagram* d);
+    void setDiagram_Cmd(Diagram* d, Command* cmds);
     void setTool(Tool t);
     void setcurrStroke(QColor c);
     void setcurrFill(QColor c);
     void setStrokeWidth(double d);
+    void copy();
+    void cut();
+    void paste();
     // void move(QLineF l);
     std::shared_ptr<GraphicsObject> search(const QPointF& p_);
 
@@ -39,10 +43,14 @@ protected:
     void mousePressEvent(QMouseEvent* e) override;
     void mouseMoveEvent(QMouseEvent* e) override;
     void mouseReleaseEvent(QMouseEvent* e) override;
+    void mouseDoubleClickEvent(QMouseEvent* e) override;
+    // void mouseTripleClickEvent(QMouseEvent* e) override;
 
 private:
+    Command* commandPlate = nullptr;
     Diagram* diagram = nullptr;
     Tool currentTool = Tool::None;
+    std::shared_ptr<GraphicsObject> copiedShape = nullptr;
     std::shared_ptr<GraphicsObject> currShape = nullptr;
     bool dragging = false;
     QPointF startPos;
