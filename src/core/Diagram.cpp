@@ -19,6 +19,10 @@ void Diagram::destroy(std::shared_ptr<GraphicsObject>& obj)
     //then erase deletes all the elements from that iterator till the end.
 }
 
+int Diagram::numOfShapes() const
+{
+    return objs.size();
+}
 // void Diagram::undo_push_(const std::pair<std::shared_ptr<GraphicsObject>, int>& p)
 // {
 //     undo_stack.push_back(p);

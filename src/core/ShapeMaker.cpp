@@ -8,5 +8,6 @@ std::shared_ptr<GraphicsObject> ShapeMaker::create(Tool t, QColor strokeColor, Q
     else if(t == Tool::Hexagon) return std::make_shared<Hexagon>( strokeColor,  fillColor,  strokeWidth_);
     else if(t == Tool::Line) return std::make_shared<Line>( strokeColor,  fillColor,  strokeWidth_);
     else if(t == Tool::Text) return std::make_shared<Text>( strokeColor,  fillColor,  strokeWidth_);
+    else if (t == Tool::Freehand) return std::make_shared<Freehand>(strokeColor, fillColor, strokeWidth_);
     else return nullptr;
 }

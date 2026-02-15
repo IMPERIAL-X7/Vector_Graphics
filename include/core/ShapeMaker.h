@@ -6,6 +6,7 @@
 #include "shapes/Lines.h"
 #include "shapes/Text.h"
 #include "core/Tool.h"
+#include "shapes/Freehand.h"
 
 class ShapeMaker
 {

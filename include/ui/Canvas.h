@@ -2,6 +2,7 @@
 #include "core/Diagram.h"
 #include "core/Tool.h"
 #include "core/Command.h"
+#include "shapes/Freehand.h"
 #include <QWidget>
 #include <QPointF>
 #include <QMouseEvent>
@@ -52,6 +53,7 @@ private:
     Tool currentTool = Tool::None;
     std::shared_ptr<GraphicsObject> copiedShape = nullptr;
     std::shared_ptr<GraphicsObject> currShape = nullptr;
+    std::shared_ptr<Freehand> currFreehand = nullptr;
     bool dragging = false;
     QPointF startPos;
     QPointF justBefore;

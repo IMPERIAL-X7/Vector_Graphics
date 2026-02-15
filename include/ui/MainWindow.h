@@ -37,6 +37,7 @@ private:
     QAction* circleAction;
     QAction* rectAction;
     QAction* roundRectAction;
+    QAction* freehandAction;
     QAction* lineAction;
     QAction* hexagonAction;
     QAction* resizeAction;

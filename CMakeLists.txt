@@ -31,6 +31,7 @@ add_executable(VectorGraphics
     src/shapes/Hexagon.cpp
     src/shapes/Line.cpp
     src/shapes/Text.cpp
+    src/shapes/Freehand.cpp
 )
 
 target_include_directories(VectorGraphics

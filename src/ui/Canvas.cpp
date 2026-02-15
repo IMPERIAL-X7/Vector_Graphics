@@ -61,8 +61,8 @@ void Canvas::paintEvent(QPaintEvent*)
     {
         obj->draw(p);
     }
-
-
+    
+    
     if(dragging)
     {
         double resizeFactor = 1.0;
@@ -88,6 +88,7 @@ void Canvas::paintEvent(QPaintEvent*)
         p.setPen(QPen(Qt::red, 2, Qt::DashDotDotLine));
         p.setBrush(Qt::NoBrush);
         p.drawRect(box);
+        if(currentTool == Tool::Freehand) {currFreehand->draw(p); return;}
         if(currentTool != Tool::Resize && currentTool != Tool::Move)
         {
             auto previewShape_ = ShapeMaker::create(currentTool, currStroke, currFill, currStrokeWidth);
@@ -95,7 +96,7 @@ void Canvas::paintEvent(QPaintEvent*)
             previewShape_->setBoundingBox(startPos, currentPos);
             std::cout << "Drawing preview shape" << std::endl;
             previewShape_->draw(p);
-        }   
+        }
     }
 }
 
@@ -120,13 +121,18 @@ void Canvas::mousePressEvent(QMouseEvent* e)
         justBefore = startPos;
         currentPos = startPos; return;
     }
-    if(e->button() != Qt::LeftButton) return;
+    // if(e->button() != Qt::LeftButton) return;
     if(currentTool == Tool::Select)
     {
         currShape = search(e->position()); 
         update(); return;
     }
     commandPlate->clearRedoStack();
+    if(currentTool == Tool::Freehand)
+    {
+        currFreehand = std::dynamic_pointer_cast<Freehand>(ShapeMaker::create(Tool::Freehand, currStroke, currFill, currStrokeWidth));
+        currFreehand->addPoint(e->position());
+    }
     //if tool is resizeing then scan the diagram to find current obj, if found currobj is that else return.
     if(currentTool == Tool::Resize || currentTool == Tool:: Move)
     {
@@ -134,6 +140,7 @@ void Canvas::mousePressEvent(QMouseEvent* e)
     }
 
     dragging = true;
+    std::cout << "drag set true" << std::endl;
     startPos = e->position();
     justBefore = startPos;
     currentPos = startPos;
@@ -144,6 +151,11 @@ void Canvas::mouseMoveEvent(QMouseEvent* e)
     if(!dragging || !diagram) return;
 
     currentPos = e->position();
+    if(dragging && currentTool == Tool::Freehand)
+    {
+        currFreehand->addPoint(currentPos);
+        update();
+    }
     update();
     // justBefore = currentPos;
 }
@@ -152,15 +164,34 @@ void Canvas::mouseReleaseEvent(QMouseEvent* e)
 {
     if(!dragging || !diagram) return;
 
+    std::cout << diagram->numOfShapes() << std::endl;
     dragging = false;
     update();
     currentPos = e->position();
+
+    auto box_ = QRectF(startPos, currentPos);
+    box_ = box_.normalized();
+    double area = box_.width() * box_.height();
+    if(area < 3) return;
+
+    if(currentTool == Tool::Freehand && currFreehand)
+    {
+        std::cout << "type_casting" << std::endl;
+        auto obj = std::static_pointer_cast<GraphicsObject>(currFreehand);
+        diagram->add(obj);
+        commandPlate->undo_push({0, currFreehand, QLineF()});
+        currFreehand->setBoundingBox(startPos, currentPos);
+        std::cout << "pushed freehand" << std::endl;
+        currFreehand = nullptr; startPos = currentPos;
+        update();
+        std::cout << diagram->numOfShapes() << std::endl; return;
+    }
     if(currentTool == Tool::Resize) return;
     if(currentTool == Tool::Move)
     {
         commandPlate->undo_push({2, currShape, QLineF(startPos, currentPos)}); return;
     }
-    
+
     auto shape = ShapeMaker::create(currentTool, currStroke, currFill, currStrokeWidth);
     if(!shape) return;
 

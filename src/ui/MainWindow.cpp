@@ -73,6 +73,11 @@ void MainWindow::createToolbar()
     connect(rectAction, &QAction::triggered, this, [this](){canvas->setTool(Tool::Rect);});
     toolGroup->addAction(rectAction);
 
+    freehandAction = new QAction("Free", this);
+    freehandAction->setCheckable(true);
+    connect(freehandAction, &QAction::triggered, this, [this](){canvas->setTool(Tool::Freehand);});
+    toolGroup->addAction(freehandAction);
+
     roundRectAction = new QAction("RoundRect", this);
     roundRectAction->setCheckable(true);
     connect(roundRectAction, &QAction::triggered, this, [this](){canvas->setTool(Tool::RoundRect);});

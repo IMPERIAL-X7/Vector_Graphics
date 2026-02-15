@@ -16,8 +16,7 @@ public:
     void add(std::shared_ptr<GraphicsObject>& obj);
     const std::vector<std::shared_ptr<GraphicsObject>>& objects() const;
     void destroy(std::shared_ptr<GraphicsObject>& obj);
-    // void undo_add();
-    // void redo_add();
+    int numOfShapes() const;
     void clear();
 private:
     std::vector<std::shared_ptr<GraphicsObject>> objs; //remember to add _ later

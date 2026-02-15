@@ -2,6 +2,8 @@
 
 enum class Tool
 {
+    None,
+    Freehand,
     Resize,
     Move,
     Circle,
@@ -10,7 +12,6 @@ enum class Tool
     Hexagon,
     Line,
     Select,
-    None,
     Text
 };
 
