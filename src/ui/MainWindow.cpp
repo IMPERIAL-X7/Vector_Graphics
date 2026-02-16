@@ -8,12 +8,20 @@
 #include <QFileDialog>
 #include <QColorDialog>
 #include <QWidgetAction>
+#include <QScrollArea>
 
 MainWindow::MainWindow() : QMainWindow()
 {
+    QScrollArea* scrollArea = new QScrollArea(this);
+    scrollArea->setBackgroundRole(QPalette::Dark); // Dark background like Inkscape
+    scrollArea->setAlignment(Qt::AlignCenter);     // Keeps the canvas in the center
+    setCentralWidget(scrollArea);
+
     canvas = new Canvas(this);
+    canvas->setFixedSize(600, 400); // Set a fixed size for the canvas
+    canvas->setStyleSheet("background-color: white; border: 2px solid #555;");
     // commands = new Command;
-    setCentralWidget(canvas);
+    scrollArea->setWidget(canvas);
     canvas->setDiagram_Cmd(&diagram, &commands);
     commands.setDiagram_cmd(&diagram);
     createMenus();
@@ -32,12 +40,19 @@ void MainWindow::createMenus()
 
     QAction* openAct = new QAction("Open", this);
     QAction* saveAct = new QAction("Save", this);
+    QAction* saveAsAct = new QAction("Save As", this);
+    QAction* newAct = new QAction("New", this);
+    QAction* closeAct = new QAction("Close", this);
     QAction* copyAct = new QAction("Copy", this);
     QAction* cutAct = new QAction("Cut", this);
     QAction* pasteAct = new QAction("Paste", this);
 
     connect(openAct, &QAction::triggered, this, &MainWindow::openSVG);
-    connect(saveAct, &QAction::triggered, this, &MainWindow::saveSVG);
+    connect(saveAct, &QAction::triggered, this, &MainWindow::save);
+    connect(saveAsAct, &QAction::triggered, this, &MainWindow::saveAs);
+    connect(newAct, &QAction::triggered, this, &MainWindow::newFile);
+    connect(closeAct, &QAction::triggered, this, &MainWindow::close);
+
     connect(copyAct, &QAction::triggered, this, [this](){canvas->copy();});
     connect(cutAct, &QAction::triggered, this, [this](){canvas->cut();});
     connect(pasteAct, &QAction::triggered, this, [this](){canvas->paste();});
@@ -45,8 +60,11 @@ void MainWindow::createMenus()
     copyMenu->addAction(copyAct);
     copyMenu->addAction(cutAct);
     copyMenu->addAction(pasteAct);
+    fileMenu->addAction(newAct);
     fileMenu->addAction(openAct);
     fileMenu->addAction(saveAct);
+    fileMenu->addAction(saveAsAct);
+    fileMenu->addAction(closeAct);
 }
 
 void MainWindow::createToolbar()
@@ -119,27 +137,6 @@ void MainWindow::createToolbar()
         []: Capture nothing.
     */
 
-    // borderAction = new QAction("Border_C", this);
-    // borderAction->setCheckable(true);
-    // connect(borderAction, &QAction::triggered, this, [this](){canvas->setcurrStroke(QColorDialog::getColor(Qt::white, this, "Select Color", QColorDialog::ShowAlphaChannel));});
-
-    // insideAction = new QAction("Fill_C", this);
-    // insideAction->setCheckable(true);
-    // connect(insideAction, &QAction::triggered, this, [this](){if(insideAction->isChecked()) canvas->setcurrFill(QColorDialog::getColor(Qt::white, this, "Select Color", QColorDialog::ShowAlphaChannel)); else canvas->setcurrFill(Qt::NoBrush);});
-
-    // thickAction = new QAction("strk_width", this);
-    // thickAction->setCheckable(true);
-    // connect(thickAction, &QAction::triggered, this, [this](){bool ok; canvas->setStrokeWidth(QInputDialog::getDouble(this, tr("Round Rect"), tr("Enter Corner Radius:"), 10, 0, 10000, 1, &ok));});
-
-    // undoAction = new QAction("Undo", this);
-    // undoAction->setCheckable(true);
-    // connect(undoAction, &QAction::triggered, this, [this](){commands.undo(); canvas->update();});
-
-    // redoAction = new QAction("Redo", this);
-    // redoAction->setCheckable(true);
-    // connect(redoAction, &QAction::triggered, this, [this](){commands.redo();canvas->update();});
-    // tools->addActions({borderAction, insideAction, thickAction, undoAction, redoAction});
-
     tools->addSeparator();
     strokeColorWidget = new QWidget();
     strokeColorWidget->setFixedSize(30, 30);
@@ -203,22 +200,53 @@ void MainWindow::createToolbar()
 void MainWindow::openSVG()
 {
     QString file = QFileDialog::getOpenFileName(
-        this, "Open XML", "", "XML Files (*.svg *.xml)"
+        this, "Open SVG", "", "SVG Files (*.svg)"
     );
     if(file.isEmpty()) return;
-
+    currentFile = file;
     diagram = XMLParser::parse(file.toStdString());
     canvas->setDiagram_Cmd(&diagram, &commands);
+    std::cout << "Opened file: " << file.toStdString() << std::endl;
+}
+
+void MainWindow::newFile()
+{
+    diagram.clear();
+    currentFile.clear();
+    commands = Command();
+    canvas->update();
+}
+
+void MainWindow::closeFile()
+{
+    MainWindow::save(); // Save before closing
+    currentFile.clear();
+    diagram.clear();
+    commands = Command();
+    canvas->update();
+}
+
+void MainWindow::save()
+{
+    if(currentFile.isEmpty())
+    {
+        saveAs();
+    }
+    SVGWriter::write(diagram, currentFile.toStdString());
+}
+
+void MainWindow::saveAs()
+{
+    saveSVG();
 }
 
 void MainWindow::saveSVG() {
 
     QString file_ = QFileDialog::getSaveFileName(
-        this, "Save SVG", "", "XML Files (*.svg, *.xml)"
+        this, "Save SVG", "", "SVG Files (*.svg)"
     );
 
     if (file_.isEmpty()) return;
-    // std::cout << file.toStdString() << std::endl;
-    std::string filePath_ = file_.toStdString() + ".xml";
+    std::string filePath_ = file_.toStdString() + ".svg";
     SVGWriter::write(diagram, filePath_);
 }

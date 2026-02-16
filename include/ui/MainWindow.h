@@ -18,6 +18,7 @@ private:
     void saveAs();
     void openSVG();
     void saveSVG();
+    void closeFile();
     // void copy();
     // void cut();
     // void paste();

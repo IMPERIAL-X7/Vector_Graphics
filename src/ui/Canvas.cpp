@@ -8,12 +8,12 @@
 
 Canvas::Canvas(QWidget* parent) : QWidget(parent)
 {
-    resize(600, 600);
+    setFixedSize(600, 400);
     QPalette pal = palette();
     pal.setColor(QPalette::Window, Qt::white);
     setPalette(pal);
     setAutoFillBackground(true);
-
+    // setStyleSheet("background-color: white; border: 2px solid #555;");
 }
 Canvas::~Canvas() {}
 
@@ -49,10 +49,12 @@ void Canvas::paintEvent(QPaintEvent*)
     if(!diagram) return;
 
     QPainter p(this);
+    p.fillRect(rect(), Qt::white);
     p.setRenderHint(QPainter::Antialiasing);
     //Antialiasing to smoothen the curve, remove staircase effect.
     if(currentTool == Tool::Select)
     {
+        if(!currShape) return;
         p.setPen(QPen(Qt::red, 2, Qt::DashDotDotLine));
         p.drawRect(currShape->boundingBox());
     }
@@ -65,6 +67,7 @@ void Canvas::paintEvent(QPaintEvent*)
     
     if(dragging)
     {
+        if(currentTool == Tool::None) return;
         double resizeFactor = 1.0;
         QRectF box(startPos, currentPos);
         box = box.normalized();
