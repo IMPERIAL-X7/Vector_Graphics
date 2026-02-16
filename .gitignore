@@ -2,4 +2,4 @@ build/
 *.xml
 *.svg
 .vscode/
-.clang-format-*
+.clang-format

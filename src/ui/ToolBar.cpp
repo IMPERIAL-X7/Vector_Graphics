@@ -127,11 +127,11 @@ void MainWindow::createToolbar() {
   tools->addAction(fillAction);
   tools->addAction(insideAction);
 
-  thickAction = new QAction("strk_width", this);
+  thickAction = new QAction("Width", this);
   connect(thickAction, &QAction::triggered, this, [this]() {
     bool ok;
     canvas->setStrokeWidth(QInputDialog::getDouble(
-        this, tr("Stroke Width"), tr("Enter Width:"), 1.0, 0.1, 100.0, 1, &ok));
+        this, tr("Stroke Width"), tr("Enter Width:"), 3.0, 0.1, 100.0, 1, &ok));
   });
 
   tools->addActions({thickAction});
