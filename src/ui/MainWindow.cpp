@@ -27,7 +27,7 @@ MainWindow::MainWindow() : QMainWindow()
     createMenus();
     createToolbar();
 
-    resize(800, 800);
+    resize(800, 600);
 }
 
 MainWindow::~MainWindow(){}
@@ -36,35 +36,49 @@ MainWindow::~MainWindow(){}
 void MainWindow::createMenus()
 {
     QMenu* fileMenu = menuBar()->addMenu("File");
-    QMenu* copyMenu = menuBar()->addMenu("Copy");
+    // QMenu* copyMenu = menuBar()->addMenu("Copy");
+    // Syntax: addAction(Text, Receiver, Member/Slot, Shortcut)
+    fileMenu->addAction("New",     QKeySequence::New,    this, &MainWindow::newFile);
+    fileMenu->addAction("Open",    QKeySequence::Open,   this, &MainWindow::openSVG);
+    fileMenu->addAction("Save",    QKeySequence::Save,   this, &MainWindow::save);
+    fileMenu->addAction("Save As", QKeySequence::SaveAs, this, &MainWindow::saveAs);
+    fileMenu->addAction("Close",   QKeySequence::Close,  this, &MainWindow::close);
 
-    QAction* openAct = new QAction("Open", this);
-    QAction* saveAct = new QAction("Save", this);
-    QAction* saveAsAct = new QAction("Save As", this);
-    QAction* newAct = new QAction("New", this);
-    QAction* closeAct = new QAction("Close", this);
-    QAction* copyAct = new QAction("Copy", this);
-    QAction* cutAct = new QAction("Cut", this);
-    QAction* pasteAct = new QAction("Paste", this);
+    QMenu* editMenu = menuBar()->addMenu("Edit");
+    editMenu->addAction("Undo",  QKeySequence::Undo,  this, [this](){ commands.undo(); canvas->update(); });
+    editMenu->addAction("Redo",  QKeySequence::Redo,  this, [this](){ commands.redo(); canvas->update(); });
+    editMenu->addSeparator();
+    editMenu->addAction("Cut",   QKeySequence::Cut,   this, [this](){ canvas->cut();   });
+    editMenu->addAction("Copy",  QKeySequence::Copy,  this, [this](){ canvas->copy();  });
+    editMenu->addAction("Paste", QKeySequence::Paste, this, [this](){ canvas->paste(); });
 
-    connect(openAct, &QAction::triggered, this, &MainWindow::openSVG);
-    connect(saveAct, &QAction::triggered, this, &MainWindow::save);
-    connect(saveAsAct, &QAction::triggered, this, &MainWindow::saveAs);
-    connect(newAct, &QAction::triggered, this, &MainWindow::newFile);
-    connect(closeAct, &QAction::triggered, this, &MainWindow::close);
+    // QAction* openAct = new QAction("Open", this);
+    // QAction* saveAct = new QAction("Save", this);
+    // QAction* saveAsAct = new QAction("Save As", this);
+    // QAction* newAct = new QAction("New", this);
+    // QAction* closeAct = new QAction("Close", this);
+    // QAction* copyAct = new QAction("Copy", this);
+    // QAction* cutAct = new QAction("Cut", this);
+    // QAction* pasteAct = new QAction("Paste", this);
 
-    connect(copyAct, &QAction::triggered, this, [this](){canvas->copy();});
-    connect(cutAct, &QAction::triggered, this, [this](){canvas->cut();});
-    connect(pasteAct, &QAction::triggered, this, [this](){canvas->paste();});
+    // connect(openAct, &QAction::triggered, this, &MainWindow::openSVG);
+    // connect(saveAct, &QAction::triggered, this, &MainWindow::save);
+    // connect(saveAsAct, &QAction::triggered, this, &MainWindow::saveAs);
+    // connect(newAct, &QAction::triggered, this, &MainWindow::newFile);
+    // connect(closeAct, &QAction::triggered, this, &MainWindow::close);
 
-    copyMenu->addAction(copyAct);
-    copyMenu->addAction(cutAct);
-    copyMenu->addAction(pasteAct);
-    fileMenu->addAction(newAct);
-    fileMenu->addAction(openAct);
-    fileMenu->addAction(saveAct);
-    fileMenu->addAction(saveAsAct);
-    fileMenu->addAction(closeAct);
+    // connect(copyAct, &QAction::triggered, this, [this](){canvas->copy();});
+    // connect(cutAct, &QAction::triggered, this, [this](){canvas->cut();});
+    // connect(pasteAct, &QAction::triggered, this, [this](){canvas->paste();});
+
+    // copyMenu->addAction(copyAct);
+    // copyMenu->addAction(cutAct);
+    // copyMenu->addAction(pasteAct);
+    // fileMenu->addAction(newAct);
+    // fileMenu->addAction(openAct);
+    // fileMenu->addAction(saveAct);
+    // fileMenu->addAction(saveAsAct);
+    // fileMenu->addAction(closeAct);
 }
 
 void MainWindow::createToolbar()
@@ -186,13 +200,13 @@ void MainWindow::createToolbar()
     thickAction = new QAction("strk_width", this);
     connect(thickAction, &QAction::triggered, this, [this](){bool ok; canvas->setStrokeWidth(QInputDialog::getDouble(this, tr("Stroke Width"), tr("Enter Width:"), 1.0, 0.1, 100.0, 1, &ok));});
 
-    undoAction = new QAction("Undo", this);
-    connect(undoAction, &QAction::triggered, this, [this](){commands.undo(); canvas->update();});
+    // undoAction = new QAction("Undo", this);
+    // connect(undoAction, &QAction::triggered, this, [this](){commands.undo(); canvas->update();});
 
-    redoAction = new QAction("Redo", this);
-    connect(redoAction, &QAction::triggered, this, [this](){commands.redo(); canvas->update();});
+    // redoAction = new QAction("Redo", this);
+    // connect(redoAction, &QAction::triggered, this, [this](){commands.redo(); canvas->update();});
 
-    tools->addActions({ thickAction, undoAction, redoAction});
+    tools->addActions({thickAction});
 
 
 }

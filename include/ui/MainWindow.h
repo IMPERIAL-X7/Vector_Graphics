@@ -32,8 +32,8 @@ private:
     QAction* insideAction;
     QAction* thickAction;
     QAction* textAction;
-    QAction* undoAction;
-    QAction* redoAction;
+    // QAction* undoAction;
+    // QAction* redoAction;
     QAction* circleAction;
     QAction* rectAction;
     QAction* roundRectAction;
