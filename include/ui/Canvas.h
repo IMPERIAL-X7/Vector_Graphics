@@ -1,6 +1,8 @@
 #pragma once
+#include <QInputDialog>
 #include <QMouseEvent>
 #include <QPaintEvent>
+#include <QPainter>
 #include <QPointF>
 #include <QWidget>
 
@@ -36,7 +38,6 @@ class Canvas : public QWidget {
   void copy();
   void cut();
   void paste();
-  std::shared_ptr<GraphicsObject> getCanvas() const;
   std::shared_ptr<GraphicsObject> search(const QPointF& p_);
 
  protected:
@@ -45,8 +46,6 @@ class Canvas : public QWidget {
   void mouseMoveEvent(QMouseEvent* e) override;
   void mouseReleaseEvent(QMouseEvent* e) override;
   void mouseDoubleClickEvent(QMouseEvent* e) override;
-  std::pair<int, int> getSizeOfCanvas() const;
-  // void mouseTripleClickEvent(QMouseEvent* e) override;
 
  private:
   Command* commandPlate = nullptr;

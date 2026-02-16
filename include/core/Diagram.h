@@ -27,10 +27,9 @@ class Diagram {
   // void redo_push_(const std::pair<std::shared_ptr<GraphicsObject>, int>& p);
 };
 
-/*
-    no. -> lastAction
-    0 -> add
-    1 -> delete
-    2 -> resize
-    3 -> move
-*/
+struct CanvasState {
+  std::shared_ptr<Diagram> diagram;
+  int width, height;
+  CanvasState(std::shared_ptr<Diagram> d, int w, int h)
+      : diagram(d), width(w), height(h) {}
+};

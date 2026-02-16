@@ -6,12 +6,12 @@ void Command::setDiagram_cmd(Diagram* di) { diagram = di; }
 
 void Command::undo_push(const command_info& infos) {
   undo_stack.push_back(infos);
-  if (undo_stack.size() > 15) undo_stack.pop_front();
+  if (undo_stack.size() > 20) undo_stack.pop_front();
 }
 
 void Command::redo_push(const command_info& infos) {
   redo_stack.push_back(infos);
-  if (redo_stack.size() > 15) redo_stack.pop_front();
+  if (redo_stack.size() > 20) redo_stack.pop_front();
 }
 
 void Command::undo() {

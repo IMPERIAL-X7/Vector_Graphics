@@ -1,15 +1,12 @@
 #include "shapes/Freehand.h"
 
-#include <QPainterPath>
-#include <iostream>
-#include <sstream>
-
 Freehand::Freehand(QColor strokeColor, QColor fillColor, double strokeWidth_) {
   stroke = strokeColor;
   fill = fillColor;
   strokeWidth = strokeWidth_;
 }
 
+// Appends a point to the freehand path and dynamically updates the bounding box
 void Freehand::addPoint(const QPointF& point) {
   points.push_back(point);
 

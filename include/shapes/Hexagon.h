@@ -4,7 +4,6 @@
 class Hexagon : public GraphicsObject {
  public:
   Hexagon(QColor strokeColor, QColor fillColor, double strokeWidth_);
-  // void setBoundingBox(const QPointF& p1, const QPointF& p2) override;
   void resizeBoundingBox();
   void draw(QPainter& p) const override;
   std::string toSVG() const override;

@@ -1,7 +1,15 @@
 #pragma once
 #include <QActionGroup>
+#include <QColorDialog>
+#include <QFileDialog>
+#include <QInputDialog>
 #include <QLabel>
 #include <QMainWindow>
+#include <QMenuBar>
+#include <QScrollArea>
+#include <QStyle>
+#include <QToolBar>
+#include <QWidgetAction>
 
 #include "core/Diagram.h"
 #include "ui/Canvas.h"
@@ -19,9 +27,7 @@ class MainWindow : public QMainWindow {
   void openSVG();
   void saveSVG();
   void closeFile();
-  // void copy();
-  // void cut();
-  // void paste();
+
   QString currentFile;
   Diagram diagram;
   Command commands;
@@ -32,8 +38,6 @@ class MainWindow : public QMainWindow {
   QAction* insideAction;
   QAction* thickAction;
   QAction* textAction;
-  // QAction* undoAction;
-  // QAction* redoAction;
   QAction* circleAction;
   QAction* rectAction;
   QAction* roundRectAction;

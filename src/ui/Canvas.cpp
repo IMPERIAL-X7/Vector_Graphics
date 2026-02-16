@@ -1,10 +1,5 @@
 #include "ui/Canvas.h"
 
-#include <QInputDialog>
-#include <QMouseEvent>
-#include <QPainter>
-#include <iostream>
-
 #include "core/ShapeMaker.h"
 
 Canvas::Canvas(QWidget* parent) : QWidget(parent) {
@@ -26,25 +21,34 @@ void Canvas::setDiagram_Cmd(Diagram* d, Command* cmd) {
   update();  // update tells Qt smthng had changed please redraw.
 }
 
-std::shared_ptr<GraphicsObject> Canvas::getCanvas() const { return currShape; }
+// std::shared_ptr<GraphicsObject> Canvas::getCanvas() const { return currShape;
+// }
+// void Canvas::resizeCanvas(int w, int h) {
+//   setFixedSize(w, h);
+//   update();
+// }
 
 void Canvas::setTool(Tool t) { currentTool = t; }
 
+// Search for a shape at the given point (Hit Detection)
+// Iterates in reverse to find the topmost object first
 std::shared_ptr<GraphicsObject> Canvas::search(const QPointF& p_) {
-  auto objs = diagram->objects();
+  if (!diagram) return nullptr;
+  const auto& objs = diagram->objects();
 
   for (auto it = objs.rbegin(); it != objs.rend(); ++it) {
-    if (it->get()->boundingBox().contains(p_)) return *it;
+    if ((*it)->boundingBox().contains(p_)) return *it;
   }
   return nullptr;
 }
 
+// Main drawing function, called automatically by Qt when update() is triggered
 void Canvas::paintEvent(QPaintEvent*) {
   if (!diagram) return;
 
   QPainter p(this);
-  p.fillRect(rect(), Qt::white);
-  p.setRenderHint(QPainter::Antialiasing);
+  p.fillRect(rect(), Qt::white);            // Clear background
+  p.setRenderHint(QPainter::Antialiasing);  // Smooth edges
   // Antialiasing to smoothen the curve, remove staircase effect.
   for (const auto& obj : diagram->objects()) {
     obj->draw(p);
@@ -63,6 +67,7 @@ void Canvas::paintEvent(QPaintEvent*) {
     box = box.normalized();
 
     if (currentTool == Tool::Resize || currentTool == Tool::Move) {
+      if (!currShape) return;
       double distCenter =
           QLineF(currShape->boundingBox().center(), justBefore).length();
       double distFact =
@@ -88,17 +93,10 @@ void Canvas::paintEvent(QPaintEvent*) {
     if (currentTool != Tool::Resize && currentTool != Tool::Move) {
       auto previewShape_ = ShapeMaker::create(currentTool, currStroke, currFill,
                                               currStrokeWidth);
-      std::cout << "Preview shape created: "
-                << (previewShape_ ? "Valid" : "Null") << std::endl;
       previewShape_->setBoundingBox(startPos, currentPos);
-      std::cout << "Drawing preview shape" << std::endl;
       previewShape_->draw(p);
     }
   }
-}
-
-std::pair<int, int> Canvas::getSizeOfCanvas() const {
-  return {width(), height()};
 }
 
 void Canvas::copy() {

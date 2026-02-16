@@ -9,12 +9,6 @@ Circle::Circle(QColor strokeColor, QColor fillColor, double strokeWidth_) {
   strokeWidth = strokeWidth_;
 }
 
-// void Circle::setBoundingBox(const QPointF& p1, const QPointF& p2)
-// {
-//     QRectF box_ = QRectF(p1, p2);
-//     box_ = box_.normalized();
-// }
-
 void Circle::resizeBoundingBox() {
   double mini = std::min(bBox.width(), bBox.height());
   QPointF center = bBox.center();
@@ -41,6 +35,7 @@ void Circle::draw(QPainter& p) const {
   p.drawEllipse(center, r, r);
 }
 
+// Serializes circle properties to SVG format
 std::string Circle::toSVG() const {
   /*
       <object="circle"
@@ -62,6 +57,7 @@ std::string Circle::toSVG() const {
   return oss.str();
 }
 
+// Factory method to parse SVG attributes and return a Circle instance
 std::shared_ptr<GraphicsObject> Circle::loadShape(const std::string& s1,
                                                   const std::string& s2) {
   auto style_ = style(s1);

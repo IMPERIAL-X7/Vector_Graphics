@@ -5,12 +5,16 @@
 #include "core/GraphicsObject.h"
 
 struct command_info {
+  // Command Types:
+  // 0: Creation (Undo -> Destroy)
+  // 1: Destruction (Undo -> Create)
+  // 2: Move
   int type;
   std::shared_ptr<GraphicsObject> object;
-  QLineF displacement;
+  QLineF displacement;  // For move operations
   command_info(int type, std::shared_ptr<GraphicsObject> object,
                QLineF displacement) {
-    this->type = type;
+    this->type = type;  // 0, 1, or 2
     this->object = object;
     this->displacement = displacement;
   }

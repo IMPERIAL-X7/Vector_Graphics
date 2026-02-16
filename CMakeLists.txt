@@ -25,6 +25,7 @@ add_executable(VectorGraphics
     src/ui/Canvas.cpp
     src/ui/MainWindow.cpp
     src/ui/Mouse.cpp
+    src/ui/ToolBar.cpp
     src/io/XMLParser.cpp
     src/io/SVGWriter.cpp
     src/shapes/Rect.cpp

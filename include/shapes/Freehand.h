@@ -1,5 +1,8 @@
 #pragma once
+#include <QPainterPath>
 #include <QPointF>
+#include <iostream>
+#include <sstream>
 #include <vector>
 
 #include "core/GraphicsObject.h"

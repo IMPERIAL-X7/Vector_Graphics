@@ -7,8 +7,11 @@
 #include "ui/Canvas.h"
 
 void Canvas::mouseDoubleClickEvent(QMouseEvent* e) {
+  // Double-click to start moving a shape
   currentTool = Tool::Move;
   currShape = search(e->position());
+
+  // Prepare for drag operation
   update();
   dragging = true;
   startPos = e->position();
@@ -17,9 +20,12 @@ void Canvas::mouseDoubleClickEvent(QMouseEvent* e) {
 }
 
 void Canvas::mousePressEvent(QMouseEvent* e) {
+  // Right-click initiates resizing of the shape under cursor
   if (e->button() == Qt::RightButton) {
     currentTool = Tool::Resize;
     currShape = search(e->position());
+
+    // Initialize drag state variables
     update();
     dragging = true;
     startPos = e->position();
@@ -27,75 +33,93 @@ void Canvas::mousePressEvent(QMouseEvent* e) {
     currentPos = startPos;
     return;
   }
-  // if(e->button() != Qt::LeftButton) return;
+
+  // Left-click logic
+  // If Select tool is active, just find and highlight the shape
   if (currentTool == Tool::Select) {
     currShape = search(e->position());
     update();
     return;
   }
+
+  // Clear redo stack on new action
   commandPlate->clearRedoStack();
+
+  // If Freehand tool, start a new freehand drawing
   if (currentTool == Tool::Freehand) {
     currFreehand = std::dynamic_pointer_cast<Freehand>(ShapeMaker::create(
         Tool::Freehand, currStroke, currFill, currStrokeWidth));
     currFreehand->addPoint(e->position());
   }
-  // if tool is resizeing then scan the diagram to find current obj, if found
-  // currobj is that else return.
+
+  // If resizing or moving, identify the target shape
   if (currentTool == Tool::Resize || currentTool == Tool::Move) {
     currShape = search(e->position());
   }
 
   dragging = true;
-  std::cout << "drag set true" << std::endl;
+  std::cout << "Drag started" << std::endl;
   startPos = e->position();
   justBefore = startPos;
   currentPos = startPos;
 }
 
 void Canvas::mouseMoveEvent(QMouseEvent* e) {
+  // Only process moves if a drag operation is active
   if (!dragging || !diagram) return;
 
   currentPos = e->position();
+
+  // Update freehand drawing in real-time
   if (dragging && currentTool == Tool::Freehand) {
     currFreehand->addPoint(currentPos);
     update();
   }
-  update();
-  // justBefore = currentPos;
+  update();  // Trigger redraw for rubber-banding or movement
 }
 
 void Canvas::mouseReleaseEvent(QMouseEvent* e) {
   if (!dragging || !diagram) return;
 
-  std::cout << diagram->numOfShapes() << std::endl;
+  std::cout << "Shapes count: " << diagram->numOfShapes() << std::endl;
   dragging = false;
   update();
   currentPos = e->position();
 
+  // Normalize creation box
   auto box_ = QRectF(startPos, currentPos);
   box_ = box_.normalized();
+
+  // Ignore tiny accidental drags
   double area = box_.width() * box_.height();
   if (area < 3) return;
 
+  // Finalize Freehand drawing
   if (currentTool == Tool::Freehand && currFreehand) {
-    std::cout << "type_casting" << std::endl;
+    std::cout << "Finalizing freehand" << std::endl;
     auto obj = std::static_pointer_cast<GraphicsObject>(currFreehand);
     diagram->add(obj);
+
+    // Record action for undo
     commandPlate->undo_push({0, currFreehand, QLineF()});
+
     currFreehand->setBoundingBox(startPos, currentPos);
-    std::cout << "pushed freehand" << std::endl;
     currFreehand = nullptr;
     startPos = currentPos;
     update();
-    std::cout << diagram->numOfShapes() << std::endl;
     return;
   }
+
   if (currentTool == Tool::Resize) return;
+
+  // Handle move completion
   if (currentTool == Tool::Move) {
+    // Record move for undo
     commandPlate->undo_push({2, currShape, QLineF(startPos, currentPos)});
     return;
   }
 
+  // Handle standard shape creation (Rect, Circle, etc.)
   auto shape =
       ShapeMaker::create(currentTool, currStroke, currFill, currStrokeWidth);
   if (!shape) return;

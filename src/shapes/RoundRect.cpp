@@ -17,7 +17,6 @@ void RoundRect::draw(QPainter& p) const {
     p.setBrush(fill);
   else
     p.setBrush(Qt::NoBrush);
-  // const QRectF b_ = bBox;
   p.drawRoundedRect(bBox, radius, radius);
 }
 

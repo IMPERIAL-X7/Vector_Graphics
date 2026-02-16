@@ -5,5 +5,5 @@
 
 class XMLParser {
  public:
-  static Diagram parse(const std::string& filename);
+  static CanvasState parse(const std::string& filename);
 };
