@@ -24,6 +24,7 @@ add_executable(VectorGraphics
     src/shapes/Circle.cpp
     src/ui/Canvas.cpp
     src/ui/MainWindow.cpp
+    src/ui/Mouse.cpp
     src/io/XMLParser.cpp
     src/io/SVGWriter.cpp
     src/shapes/Rect.cpp

@@ -1,0 +1,143 @@
+#include <QInputDialog>
+#include <QMouseEvent>
+#include <QPainter>
+#include <iostream>  // for debugging
+
+#include "core/ShapeMaker.h"
+#include "ui/Canvas.h"
+
+void Canvas::mouseDoubleClickEvent(QMouseEvent* e) {
+  currentTool = Tool::Move;
+  currShape = search(e->position());
+  update();
+  dragging = true;
+  startPos = e->position();
+  justBefore = startPos;
+  currentPos = startPos;
+}
+
+void Canvas::mousePressEvent(QMouseEvent* e) {
+  if (e->button() == Qt::RightButton) {
+    currentTool = Tool::Resize;
+    currShape = search(e->position());
+    update();
+    dragging = true;
+    startPos = e->position();
+    justBefore = startPos;
+    currentPos = startPos;
+    return;
+  }
+  // if(e->button() != Qt::LeftButton) return;
+  if (currentTool == Tool::Select) {
+    currShape = search(e->position());
+    update();
+    return;
+  }
+  commandPlate->clearRedoStack();
+  if (currentTool == Tool::Freehand) {
+    currFreehand = std::dynamic_pointer_cast<Freehand>(ShapeMaker::create(
+        Tool::Freehand, currStroke, currFill, currStrokeWidth));
+    currFreehand->addPoint(e->position());
+  }
+  // if tool is resizeing then scan the diagram to find current obj, if found
+  // currobj is that else return.
+  if (currentTool == Tool::Resize || currentTool == Tool::Move) {
+    currShape = search(e->position());
+  }
+
+  dragging = true;
+  std::cout << "drag set true" << std::endl;
+  startPos = e->position();
+  justBefore = startPos;
+  currentPos = startPos;
+}
+
+void Canvas::mouseMoveEvent(QMouseEvent* e) {
+  if (!dragging || !diagram) return;
+
+  currentPos = e->position();
+  if (dragging && currentTool == Tool::Freehand) {
+    currFreehand->addPoint(currentPos);
+    update();
+  }
+  update();
+  // justBefore = currentPos;
+}
+
+void Canvas::mouseReleaseEvent(QMouseEvent* e) {
+  if (!dragging || !diagram) return;
+
+  std::cout << diagram->numOfShapes() << std::endl;
+  dragging = false;
+  update();
+  currentPos = e->position();
+
+  auto box_ = QRectF(startPos, currentPos);
+  box_ = box_.normalized();
+  double area = box_.width() * box_.height();
+  if (area < 3) return;
+
+  if (currentTool == Tool::Freehand && currFreehand) {
+    std::cout << "type_casting" << std::endl;
+    auto obj = std::static_pointer_cast<GraphicsObject>(currFreehand);
+    diagram->add(obj);
+    commandPlate->undo_push({0, currFreehand, QLineF()});
+    currFreehand->setBoundingBox(startPos, currentPos);
+    std::cout << "pushed freehand" << std::endl;
+    currFreehand = nullptr;
+    startPos = currentPos;
+    update();
+    std::cout << diagram->numOfShapes() << std::endl;
+    return;
+  }
+  if (currentTool == Tool::Resize) return;
+  if (currentTool == Tool::Move) {
+    commandPlate->undo_push({2, currShape, QLineF(startPos, currentPos)});
+    return;
+  }
+
+  auto shape =
+      ShapeMaker::create(currentTool, currStroke, currFill, currStrokeWidth);
+  if (!shape) return;
+
+  shape->setBoundingBox(startPos, currentPos);
+
+  if (currentTool == Tool::RoundRect) {
+    bool ok;
+    float radius = QInputDialog::getDouble(this, tr("Round Rect"),
+                                           tr("Enter Corner Radius:"), 10, 0,
+                                           10000, 1, &ok);
+    if (ok) {
+      auto rr = std::dynamic_pointer_cast<RoundRect>(shape);
+      rr->setRadius(radius);
+      std::cout << rr->viewRadius() << std::endl;
+    } else {
+      update();
+      return;
+    }
+  } else if (currentTool == Tool::Text) {
+    bool ok;
+    QString qText =
+        QInputDialog::getText(this, tr("Text Box"), tr("Enter text"),
+                              QLineEdit::Normal, tr("write here"), &ok);
+    if (ok) {
+      auto textBox = std::dynamic_pointer_cast<Text>(shape);
+      textBox->setText(qText);
+    } else {
+      update();
+      return;
+    }
+  }
+  diagram->add(shape);
+  commandPlate->undo_push({0, shape, QLineF(startPos, currentPos)});
+  if (currentTool == Tool::Circle) {
+    auto s = std::dynamic_pointer_cast<Circle>(shape);
+    s->resizeBoundingBox();
+  }
+  if (currentTool == Tool::Hexagon) {
+    auto s = std::dynamic_pointer_cast<Hexagon>(shape);
+    s->resizeBoundingBox();
+  }
+  update();
+  startPos = currentPos;
+}
