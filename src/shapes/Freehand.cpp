@@ -1,6 +1,7 @@
 #include "shapes/Freehand.h"
 #include <QPainterPath>
 #include <sstream>
+#include <iostream>
 
 Freehand::Freehand(QColor strokeColor, QColor fillColor, double strokeWidth_)
 {
@@ -39,21 +40,39 @@ void Freehand::draw(QPainter& p) const
 
 std::string Freehand::toSVG() const
 {
-    if (points.empty()) return "";
-    
-    std::stringstream ss;
-    ss << "<polyline points=\"";
-    
+    std::ostringstream oss;
+    oss << "<object=\"freehand\"" << "\n"
+        << "stroke=\"" << stroke.name(QColor::HexArgb).toStdString() << "\" "
+        << "stroke-width=\"" << strokeWidth << "\" "
+        << "fill=\"none\"\n"
+        << "points=\"";
     for (size_t i = 0; i < points.size(); ++i) {
-        ss << points[i].x() << "," << points[i].y();
-        if (i < points.size() - 1) ss << " ";
+        if (i > 0) oss << " ";
+        oss << points[i].x() << "," << points[i].y();
+    }
+    oss << "\" />\n";
+    return oss.str();
+}
+
+std::shared_ptr<GraphicsObject> Freehand::loadShape(const std::string& s1, const std::string& s2)
+{
+    auto style_ = style(s1);
+    auto freehand = std::make_shared<Freehand>(style_.stroke, style_.fill, style_.strokeWidth);
+
+    // Parse points from s2 (format: "x1,y1 x2,y2 x3,y3 ...")
+    std::istringstream iss(s2);
+    std::string pointPair; iss >> pointPair;
+    std::cout << pointPair << std::endl;
+    while (iss >> pointPair) {
+        size_t commaPos = pointPair.find(','); std::cout << pointPair << std::endl;
+        if (commaPos != std::string::npos) {
+            double x = std::stod(pointPair.substr(0, commaPos));
+            double y = std::stod(pointPair.substr(commaPos + 1));
+            freehand->addPoint(QPointF(x, y));
+        }
     }
     
-    ss << "\" stroke=\"" << stroke.name().toStdString() 
-       << "\" stroke-width=\"" << strokeWidth 
-       << "\" fill=\"none\"/>";
-    
-    return ss.str();
+    return freehand;
 }
 
 std::shared_ptr<GraphicsObject> Freehand::clone() const

@@ -13,20 +13,19 @@ public:
     MainWindow();
     ~MainWindow();
 private:
+    void newFile();
+    void save();
+    void saveAs();
     void openSVG();
     void saveSVG();
     // void copy();
     // void cut();
     // void paste();
-
+    QString currentFile;
     Diagram diagram;
     Command commands;
     Canvas* canvas;
     QActionGroup* toolGroup;
-    // QActionGroup* copyGroup;
-    // QAction* copyAction;
-    // QAction* cutAction;
-    // QAction* pasteAction;
     QAction* selectAction;
     QAction* borderAction;
     QAction* insideAction;

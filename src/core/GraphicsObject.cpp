@@ -1,4 +1,5 @@
 #include "core/GraphicsObject.h"
+// #include<iostream>
 
 GraphicsObject::~GraphicsObject() = default;
 
@@ -35,12 +36,14 @@ void GraphicsObject::resize(const double factor)
     double h = bBox.height();
     double newW = w * factor;
     double newH = h * factor;
-    double newX = center.x() - newW / 2;
-    double newY = center.y() - newH / 2;
-    bBox = QRectF(newX, newY, newW, newH);
+    double newX = center.x() - newW / 2.0;
+    double newY = center.y() - newH / 2.0;
+    bBox = QRectF(newX, newY, newW, newH).normalized();
+    // std::cout << toSVG() << std::endl;
 }
 
 void GraphicsObject::move(const QLineF l)
 {
     bBox.translate(l.dx(), l.dy());
+    // std::cout << toSVG() << std::endl;
 }

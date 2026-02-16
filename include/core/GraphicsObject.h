@@ -1,17 +1,9 @@
 #pragma once
 #include<memory>
 #include<string>
+#include <sstream>
 #include<QPainter>
-
-// struct BoundingBox
-// {
-//     QPointF p1, p2;
-//     QRectF rect() const 
-//     {
-//         return QRectF(p1, p2).normalized();
-//     }
-// };
-
+// #include "core/ShapeMaker.h"
 
 class GraphicsObject
 {
@@ -36,6 +28,7 @@ public:
     virtual void draw(QPainter& p) const = 0;
     virtual std::string toSVG() const = 0;
     virtual std::shared_ptr<GraphicsObject> clone() const = 0;
+    // static std::shared_ptr<GraphicsObject> loadShape(const std::string& s1, const std::string& s2);
     //can we go >= 2 levels down in case of virtual functions?
     void resize(const double factor);
     void move(const QLineF l);
@@ -44,8 +37,6 @@ public:
     void setStrokeWidth(float w);
     virtual void setBoundingBox(const QPointF& p1, const QPointF& p2);
     const QRectF& boundingBox() const;
-    // void setP1(const QPointF& p);
-    // void setP2(const QPointF& p);
 
 protected:
     QColor stroke = Qt::black;
@@ -54,4 +45,22 @@ protected:
     // QPointF p1;
     // QPointF p2;
     QRectF bBox;
+};
+
+struct style
+{
+    QColor stroke; double strokeWidth; QColor fill;
+    style(std::string s)
+    {
+        size_t pos = 0;
+
+        pos = s.find("stroke=\"") + 8;
+        stroke = QColor(QString::fromStdString(s.substr(pos, s.find("\"", pos) - pos)));
+
+        pos = s.find("fill=\"") + 6;
+        fill = QColor(QString::fromStdString(s.substr(pos, s.find("\"", pos) - pos)));
+
+        pos = s.find("stroke-width=\"") + 14;
+        strokeWidth = std::stod(s.substr(pos, s.find("\"", pos) - pos));
+    }
 };

@@ -1,6 +1,6 @@
 #include "shapes/Circle.h"
-#include <sstream>
 #include <QString>
+// #include <iostream>
 
 
 Circle::Circle(QColor strokeColor, QColor fillColor, double strokeWidth_)
@@ -22,11 +22,10 @@ void Circle::resizeBoundingBox()
     QPointF center = bBox.center();
     double w = bBox.width();
     double h = bBox.height();
-    double newW = mini;
-    double newH = mini;
-    double newX = center.x() - newW / 2;
-    double newY = center.y() - newH / 2;
-    bBox = QRectF(newX, newY, newW, newH);
+    double newX = center.x() - mini / 2;
+    double newY = center.y() - mini / 2;
+    bBox = QRectF(newX, newY, mini, mini);
+    // cx = bBox.x(); cy = bBox.y(); r = mini/2;
 }
 
 void Circle::draw(QPainter& p) const
@@ -41,19 +40,47 @@ void Circle::draw(QPainter& p) const
     float r = std::min(bBox.width() , bBox.height()) / 2.0f;
     QPointF center = bBox.center();
     p.drawEllipse(center, r, r);
+
 }
 
 std::string Circle::toSVG() const
 {
+    /*
+        <object="circle"
+        style="fill, stroke, width"
+        cx="" cy ="" r=""
+    */
+    double cx, cy, r; r= bBox.width()/2.0;
+    cx = bBox.x() + r ; cy = bBox.y() + r; 
     std::ostringstream oss;
-    // oss << "<circle " 
-    //     << "cx=\"" << cx << "\" "
-    //     << "cy=\"" << cy << "\" "
-    //     << "r=\"" << r << "\" "
-    //     << "stroke=\"" << stroke << "\" "
-    //     << "stroke-width=\"" << strokeWidth << "\" "
-    //     << "fill=\"" << fill << "\" />\n";
+    oss << "<object=\"circle\"" << "\n"
+        << "stroke=\"" << stroke.name(QColor::HexArgb).toStdString() << "\" "  // 8-digit hex with alpha
+        << "stroke-width=\"" << strokeWidth << "\" "
+        << "fill=\"" << fill.name(QColor::HexArgb).toStdString() << "\"\n" 
+        << "cx=\"" << cx << "\" "
+        << "cy=\"" << cy << "\" "
+        << "r=\"" << r << "\" " << "/>\n";
     return oss.str();
+}
+
+std::shared_ptr<GraphicsObject> Circle::loadShape(const std::string& s1, const std::string& s2)
+{
+    auto style_ = style(s1);
+    auto circle = std::make_shared<Circle>(style_.stroke,style_.fill , style_.strokeWidth);
+    double cx, cy, r;
+    size_t cx_pos = s2.find("cx=\"") + 4;
+    size_t cx_end = s2.find("\"", cx_pos);
+    cx = std::stod(s2.substr(cx_pos, cx_end - cx_pos));
+
+    size_t cy_pos = s2.find("cy=\"") + 4;
+    size_t cy_end = s2.find("\"", cy_pos);
+    cy = std::stod(s2.substr(cy_pos, cy_end - cy_pos));
+
+    size_t r_pos = s2.find("r=\"") + 3;
+    size_t r_end = s2.find("\"", r_pos);
+    r = std::stod(s2.substr(r_pos, r_end - r_pos));
+    circle->setBoundingBox(QPointF(cx - r, cy - r), QPointF(cx + r, cy + r));
+    return circle;
 }
 
 std::shared_ptr<GraphicsObject> Circle::clone() const

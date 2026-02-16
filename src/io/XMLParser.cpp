@@ -1,5 +1,11 @@
-#include "io/XMLParser.h"
 #include "shapes/Circle.h"
+#include "shapes/Rect.h"
+#include "shapes/RoundRect.h"
+#include "shapes/Hexagon.h"
+#include "shapes/Text.h"
+#include "shapes/Lines.h"
+#include "shapes/Freehand.h"
+#include "io/XMLParser.h"
 #include <fstream>
 #include <sstream>
 
@@ -24,38 +30,48 @@ static bool extractAttribute(
 Diagram XMLParser::parse(const std::string& filename)
 {
     Diagram d;
-    // std::ifstream in(filename);
-    // std::string line;
-    // while (std::getline(in, line)) {
+    std::ifstream file(filename);
+    if (!file.is_open()) return d;
 
-    //     // Only handle circles for now
-    //     if (line.find("<circle") != std::string::npos) {
-
-    //         std::string cxStr, cyStr, rStr;
-    //         extractAttribute(line, "cx", cxStr);
-    //         extractAttribute(line, "cy", cyStr);
-    //         extractAttribute(line, "r",  rStr);
-
-    //         float cx = std::stof(cxStr);
-    //         float cy = std::stof(cyStr);
-    //         float r  = std::stof(rStr);
-
-    //         auto circle = std::make_shared<Circle>();
-
-    //         // // Optional style attributes
-    //         std::string stroke, fill, sw;
-    //         if (extractAttribute(line, "stroke", stroke))
-    //             circle->setStroke(stroke);
-
-    //         if (extractAttribute(line, "fill", fill))
-    //             circle->setFill(fill);
-
-    //         if (extractAttribute(line, "stroke-width", sw))
-    //             circle->setStrokeWidth(std::stof(sw));
-
-    //         d.add(circle);
-    //     }
-    // }
-
+    std::string line;
+    while (std::getline(file, line)) {
+        std::string s1, s2;
+        getline(file, s1); getline(file, s2);
+        if (line.find("circle") != std::string::npos) 
+        {
+            std::shared_ptr<GraphicsObject> circle_ = Circle::loadShape(s1, s2);
+            d.add(circle_);
+        }
+        else if(line.find("rect") != std::string::npos)
+        {
+            std::shared_ptr<GraphicsObject> rect_ = Rect::loadShape(s1, s2);
+            d.add(rect_);
+        }
+        else if(line.find("roundRect") != std::string::npos)
+        {
+            std::shared_ptr<GraphicsObject> roundRect_ = RoundRect::loadShape(s1, s2);
+            d.add(roundRect_);
+        }
+        else if(line.find("Hexagon") != std::string::npos)
+        {
+            std::shared_ptr<GraphicsObject> hexagon_ = Hexagon::loadShape(s1, s2);
+            d.add(hexagon_);
+        }
+        else if(line.find("text") != std::string::npos)
+        {
+            std::shared_ptr<GraphicsObject> text_ = Text::loadShape(s1, s2);
+            d.add(text_);
+        }
+        else if(line.find("line") != std::string::npos)
+        {
+            std::shared_ptr<GraphicsObject> line_ = Line::loadShape(s1, s2);
+            d.add(line_);
+        }
+        else if(line.find("freehand") != std::string::npos)
+        {
+            std::shared_ptr<GraphicsObject> freehand_ = Freehand::loadShape(s1, s2);
+            d.add(freehand_);
+        }
+    }
     return d;
 }

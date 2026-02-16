@@ -10,6 +10,7 @@ public:
     void draw(QPainter& p) const override;
     std::string toSVG() const override;
     std::shared_ptr<GraphicsObject> clone() const override;
+    static std::shared_ptr<GraphicsObject> loadShape(const std::string& s1, const std::string& s2);
 
     void setWidth(float w);
 private:
